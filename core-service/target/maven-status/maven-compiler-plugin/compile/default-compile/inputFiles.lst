@@ -1,0 +1,11 @@
+/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/entity/UserEntity.java
+/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/service/UserService.java
+/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/CoreServiceApplication.java
+/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/mapper/UserMapper.java
+/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/model/UserResponse.java
+/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/application/UserApplicationService.java
+/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/api/ApiUtil.java
+/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/repository/UserRepository.java
+/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/model/CreateUserRequest.java
+/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/controller/UserController.java
+/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/api/UsersApi.java

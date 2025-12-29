@@ -1,0 +1,6 @@
+com/bourasenterprises/identity/core/entity/UserEntity$UserEntityBuilder.class
+com/bourasenterprises/identity/core/repository/UserRepository.class
+com/bourasenterprises/identity/core/service/UserService.class
+com/bourasenterprises/identity/core/entity/UserEntity.class
+com/bourasenterprises/identity/core/mapper/UserMapperImpl.class
+com/bourasenterprises/identity/core/CoreServiceApplication.class
