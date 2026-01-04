@@ -1,6 +1,6 @@
 package com.bourasenterprises.identity.core.mapper;
 
-import com.bourasenterprises.identity.core.entity.UserEntity;
+import com.bourasenterprises.identity.core.domain.UserEntity;
 import com.example.generated.model.CreateUserRequest;
 import com.example.generated.model.UserResponse;
 import javax.annotation.processing.Generated;
@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-12-29T14:36:22+0100",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.9 (GraalVM Community)"
+    date = "2025-12-30T19:27:42+0100",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 20.0.1 (Oracle Corporation)"
 )
 @Component
 public class UserMapperImpl implements UserMapper {

@@ -2,7 +2,7 @@ package com.bourasenterprises.identity.core.application;
 
 import org.springframework.stereotype.Service;
 
-import com.bourasenterprises.identity.core.entity.UserEntity;
+import com.bourasenterprises.identity.core.domain.UserEntity;
 import com.bourasenterprises.identity.core.mapper.UserMapper;
 import com.bourasenterprises.identity.core.service.UserService;
 import com.example.generated.model.CreateUserRequest;
