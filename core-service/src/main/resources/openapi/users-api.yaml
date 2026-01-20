@@ -64,6 +64,9 @@ components:
         id:
           type: integer
           format: int64
+        keycloakId:
+          type: string
+          format: uuid
         email:
           type: string
         fullName:

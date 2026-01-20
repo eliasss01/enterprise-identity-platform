@@ -1,0 +1,210 @@
+Index: core-service/target/generated-sources/annotations/com/bourasenterprises/identity/core/mapper/UserMapperImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.bourasenterprises.identity.core.mapper;\n\nimport com.bourasenterprises.identity.core.domain.UserEntity;\nimport com.example.generated.model.CreateUserRequest;\nimport com.example.generated.model.UserResponse;\nimport javax.annotation.processing.Generated;\nimport org.springframework.stereotype.Component;\n\n@Generated(\n    value = \"org.mapstruct.ap.MappingProcessor\",\n    date = \"2025-12-30T19:27:42+0100\",\n    comments = \"version: 1.5.5.Final, compiler: javac, environment: Java 20.0.1 (Oracle Corporation)\"\n)\n@Component\npublic class UserMapperImpl implements UserMapper {\n\n    @Override\n    public UserEntity toEntity(CreateUserRequest request) {\n        if ( request == null ) {\n            return null;\n        }\n\n        UserEntity.UserEntityBuilder userEntity = UserEntity.builder();\n\n        userEntity.email( request.getEmail() );\n        userEntity.fullName( request.getFullName() );\n\n        return userEntity.build();\n    }\n\n    @Override\n    public UserResponse toResponse(UserEntity entity) {\n        if ( entity == null ) {\n            return null;\n        }\n\n        UserResponse userResponse = new UserResponse();\n\n        userResponse.setId( entity.getId() );\n        userResponse.setEmail( entity.getEmail() );\n        userResponse.setFullName( entity.getFullName() );\n        userResponse.setActive( entity.getActive() );\n\n        return userResponse;\n    }\n}\n
+===================================================================
+diff --git a/core-service/target/generated-sources/annotations/com/bourasenterprises/identity/core/mapper/UserMapperImpl.java b/core-service/target/generated-sources/annotations/com/bourasenterprises/identity/core/mapper/UserMapperImpl.java
+--- a/core-service/target/generated-sources/annotations/com/bourasenterprises/identity/core/mapper/UserMapperImpl.java	
++++ b/core-service/target/generated-sources/annotations/com/bourasenterprises/identity/core/mapper/UserMapperImpl.java	
+@@ -8,8 +8,8 @@
+ 
+ @Generated(
+     value = "org.mapstruct.ap.MappingProcessor",
+-    date = "2025-12-30T19:27:42+0100",
+-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 20.0.1 (Oracle Corporation)"
++    date = "2026-01-19T11:36:42+0100",
++    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.8 (Oracle Corporation)"
+ )
+ @Component
+ public class UserMapperImpl implements UserMapper {
+Index: core-service/target/classes/application.yml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>server:\n  port: 8080\n\nspring:\n  datasource:\n    url: jdbc:h2:mem:coredb;MODE=Oracle\n    driver-class-name: org.h2.Driver\n    user: sa\n    password:\n  \n  jpa:\n    hibernate:\n      ddl-auto: update\n    show-sql: true\n    properties:\n      hibernate:\n        format_sql: true\n\n  h2:\n    console:\n      enabled: true\n  \n  flyway:\n    enabled: true\n        
+===================================================================
+diff --git a/core-service/target/classes/application.yml b/core-service/target/classes/application.yml
+--- a/core-service/target/classes/application.yml	
++++ b/core-service/target/classes/application.yml	
+@@ -3,23 +3,29 @@
+ 
+ spring:
+   datasource:
+-    url: jdbc:h2:mem:coredb;MODE=Oracle
+-    driver-class-name: org.h2.Driver
+-    user: sa
+-    password:
+-  
++    url: jdbc:postgresql://localhost:5433/identity_db
++    username: user
++    password: password
++    driver-class-name: org.postgresql.Driver
++
+   jpa:
+     hibernate:
+-      ddl-auto: update
++      ddl-auto: validate
+     show-sql: true
+     properties:
+       hibernate:
+-        format_sql: true
+-
+-  h2:
+-    console:
+-      enabled: true
++        dialect: org.hibernate.dialect.PostgreSQLDialect
+   
+   flyway:
+     enabled: true
+-        
+\ No newline at end of file
++
++  security:
++    oauth2:
++      resourceserver:
++        jwt:
++          issuer-uri: http://localhost:8081/realms/enterprise-platform
++
++app:
++  security:
++    cors:
++      allowed-origins: "*"
+\ No newline at end of file
+Index: core-service/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>com/bourasenterprises/identity/core/adapter/error/ApiErrorResponse.class\ncom/bourasenterprises/identity/core/domain/exception/UserAlreadyExistsException.class\ncom/bourasenterprises/identity/core/repository/UserRepository.class\ncom/bourasenterprises/identity/core/service/UserService.class\ncom/bourasenterprises/identity/core/adapter/error/GlobalExceptionHandler.class\ncom/bourasenterprises/identity/core/domain/UserEntity.class\ncom/bourasenterprises/identity/core/adapter/error/ApiErrorDetail.class\ncom/bourasenterprises/identity/core/domain/exception/UserNotFoundException.class\ncom/bourasenterprises/identity/core/mapper/UserMapperImpl.class\ncom/bourasenterprises/identity/core/domain/UserEntity$UserEntityBuilder.class\ncom/bourasenterprises/identity/core/CoreServiceApplication.class\n
+===================================================================
+diff --git a/core-service/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst b/core-service/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
+--- a/core-service/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst	
++++ b/core-service/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst	
+@@ -1,11 +1,24 @@
+ com/bourasenterprises/identity/core/adapter/error/ApiErrorResponse.class
+-com/bourasenterprises/identity/core/domain/exception/UserAlreadyExistsException.class
+ com/bourasenterprises/identity/core/repository/UserRepository.class
++com/example/generated/api/ApiUtil.class
+ com/bourasenterprises/identity/core/service/UserService.class
++com/bourasenterprises/identity/core/domain/exception/ErrorCode.class
++com/bourasenterprises/identity/core/infrastructure/logging/CorrelationIdFilter.class
++com/example/generated/api/UsersApi.class
++com/bourasenterprises/identity/core/infrastructure/kafka/messaging/KafkaProducerService.class
++com/bourasenterprises/identity/core/domain/UserEntity$UserEntityBuilder.class
++com/bourasenterprises/identity/core/CoreServiceApplication.class
++com/example/generated/model/UserResponse.class
++com/example/generated/model/CreateUserRequest.class
++com/bourasenterprises/identity/core/infrastructure/kafka/events/SubscriptionActivatedEvent.class
+ com/bourasenterprises/identity/core/adapter/error/GlobalExceptionHandler.class
++com/bourasenterprises/identity/core/security/SecurityConfig.class
++com/bourasenterprises/identity/core/domain/exception/BusinessException.class
++com/bourasenterprises/identity/core/controller/UserController.class
+ com/bourasenterprises/identity/core/domain/UserEntity.class
++com/bourasenterprises/identity/core/application/UserApplicationService.class
+ com/bourasenterprises/identity/core/adapter/error/ApiErrorDetail.class
+-com/bourasenterprises/identity/core/domain/exception/UserNotFoundException.class
++com/bourasenterprises/identity/core/mapper/UserMapper.class
++com/bourasenterprises/identity/core/config/OpenApiConfig.class
++com/bourasenterprises/identity/core/security/JwtAuthenticationConverter.class
+ com/bourasenterprises/identity/core/mapper/UserMapperImpl.class
+-com/bourasenterprises/identity/core/domain/UserEntity$UserEntityBuilder.class
+-com/bourasenterprises/identity/core/CoreServiceApplication.class
+Index: core-service/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/CoreServiceApplication.java\n/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/application/UserApplicationService.java\n/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/domain/exception/UserAlreadyExistsException.java\n/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/api/ApiUtil.java\n/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/repository/UserRepository.java\n/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/adapter/error/ApiErrorDetail.java\n/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/model/CreateUserRequest.java\n/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/domain/UserEntity.java\n/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/api/UsersApi.java\n/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/service/UserService.java\n/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/mapper/UserMapper.java\n/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/model/UserResponse.java\n/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/adapter/error/GlobalExceptionHandler.java\n/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/adapter/error/ApiErrorResponse.java\n/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/domain/exception/UserNotFoundException.java\n/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/controller/UserController.java\n
+===================================================================
+diff --git a/core-service/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst b/core-service/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
+--- a/core-service/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst	
++++ b/core-service/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst	
+@@ -1,16 +1,22 @@
+ /Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/CoreServiceApplication.java
+ /Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/application/UserApplicationService.java
+-/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/domain/exception/UserAlreadyExistsException.java
+ /Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/api/ApiUtil.java
+ /Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/repository/UserRepository.java
+ /Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/adapter/error/ApiErrorDetail.java
+ /Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/model/CreateUserRequest.java
+ /Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/domain/UserEntity.java
++/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/security/SecurityConfig.java
+ /Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/api/UsersApi.java
++/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/domain/exception/BusinessException.java
++/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/config/OpenApiConfig.java
+ /Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/service/UserService.java
++/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/infrastructure/logging/CorrelationIdFilter.java
+ /Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/mapper/UserMapper.java
+ /Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/model/UserResponse.java
+ /Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/adapter/error/GlobalExceptionHandler.java
+ /Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/adapter/error/ApiErrorResponse.java
+-/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/domain/exception/UserNotFoundException.java
++/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/domain/exception/ErrorCode.java
++/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/security/JwtAuthenticationConverter.java
++/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/infrastructure/kafka/messaging/KafkaProducerService.java
+ /Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/controller/UserController.java
++/Users/eleasbouras/Desktop/Projects/enterprise-identity-platform/core-service/src/main/java/com/bourasenterprises/identity/core/infrastructure/kafka/events/SubscriptionActivatedEvent.java
+Index: core-service/target/classes/db/migration/V1__create_users_table.sql
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>CREATE TABLE users (\n    id NUMBER(19,0) GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,\n    email VARCHAR(255) NOT NULL UNIQUE,\n    full_name VARCHAR(255) NOT NULL,\n    active BOOLEAN NULL\n);
+===================================================================
+diff --git a/core-service/target/classes/db/migration/V1__create_users_table.sql b/core-service/target/classes/db/migration/V1__create_users_table.sql
+--- a/core-service/target/classes/db/migration/V1__create_users_table.sql	
++++ b/core-service/target/classes/db/migration/V1__create_users_table.sql	
+@@ -1,6 +1,6 @@
+ CREATE TABLE users (
+-    id NUMBER(19,0) GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
++    id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+     email VARCHAR(255) NOT NULL UNIQUE,
+     full_name VARCHAR(255) NOT NULL,
+-    active BOOLEAN NULL
++    active BOOLEAN DEFAULT TRUE
+ );
+\ No newline at end of file
+Index: core-service/target/generated-sources/openapi/src/main/java/com/example/generated/model/UserResponse.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.generated.model;\n\nimport java.net.URI;\nimport java.util.Objects;\nimport com.fasterxml.jackson.annotation.JsonProperty;\nimport com.fasterxml.jackson.annotation.JsonCreator;\nimport org.openapitools.jackson.nullable.JsonNullable;\nimport java.time.OffsetDateTime;\nimport jakarta.validation.Valid;\nimport jakarta.validation.constraints.*;\nimport io.swagger.v3.oas.annotations.media.Schema;\n\n\nimport java.util.*;\nimport jakarta.annotation.Generated;\n\n/**\n * UserResponse\n */\n\n@Generated(value = \"org.openapitools.codegen.languages.SpringCodegen\", date = \"2025-12-30T19:10:08.868729+01:00[Europe/Rome]\", comments = \"Generator version: 7.5.0\")\npublic class UserResponse {\n\n  private Long id;\n\n  private String email;\n\n  private String fullName;\n\n  private Boolean active;\n\n  public UserResponse id(Long id) {\n    this.id = id;\n    return this;\n  }\n\n  /**\n   * Get id\n   * @return id\n  */\n  \n  @Schema(name = \"id\", requiredMode = Schema.RequiredMode.NOT_REQUIRED)\n  @JsonProperty(\"id\")\n  public Long getId() {\n    return id;\n  }\n\n  public void setId(Long id) {\n    this.id = id;\n  }\n\n  public UserResponse email(String email) {\n    this.email = email;\n    return this;\n  }\n\n  /**\n   * Get email\n   * @return email\n  */\n  \n  @Schema(name = \"email\", requiredMode = Schema.RequiredMode.NOT_REQUIRED)\n  @JsonProperty(\"email\")\n  public String getEmail() {\n    return email;\n  }\n\n  public void setEmail(String email) {\n    this.email = email;\n  }\n\n  public UserResponse fullName(String fullName) {\n    this.fullName = fullName;\n    return this;\n  }\n\n  /**\n   * Get fullName\n   * @return fullName\n  */\n  \n  @Schema(name = \"fullName\", requiredMode = Schema.RequiredMode.NOT_REQUIRED)\n  @JsonProperty(\"fullName\")\n  public String getFullName() {\n    return fullName;\n  }\n\n  public void setFullName(String fullName) {\n    this.fullName = fullName;\n  }\n\n  public UserResponse active(Boolean active) {\n    this.active = active;\n    return this;\n  }\n\n  /**\n   * Get active\n   * @return active\n  */\n  \n  @Schema(name = \"active\", requiredMode = Schema.RequiredMode.NOT_REQUIRED)\n  @JsonProperty(\"active\")\n  public Boolean getActive() {\n    return active;\n  }\n\n  public void setActive(Boolean active) {\n    this.active = active;\n  }\n\n  @Override\n  public boolean equals(Object o) {\n    if (this == o) {\n      return true;\n    }\n    if (o == null || getClass() != o.getClass()) {\n      return false;\n    }\n    UserResponse userResponse = (UserResponse) o;\n    return Objects.equals(this.id, userResponse.id) &&\n        Objects.equals(this.email, userResponse.email) &&\n        Objects.equals(this.fullName, userResponse.fullName) &&\n        Objects.equals(this.active, userResponse.active);\n  }\n\n  @Override\n  public int hashCode() {\n    return Objects.hash(id, email, fullName, active);\n  }\n\n  @Override\n  public String toString() {\n    StringBuilder sb = new StringBuilder();\n    sb.append(\"class UserResponse {\\n\");\n    sb.append(\"    id: \").append(toIndentedString(id)).append(\"\\n\");\n    sb.append(\"    email: \").append(toIndentedString(email)).append(\"\\n\");\n    sb.append(\"    fullName: \").append(toIndentedString(fullName)).append(\"\\n\");\n    sb.append(\"    active: \").append(toIndentedString(active)).append(\"\\n\");\n    sb.append(\"}\");\n    return sb.toString();\n  }\n\n  /**\n   * Convert the given object to string with each line indented by 4 spaces\n   * (except the first line).\n   */\n  private String toIndentedString(Object o) {\n    if (o == null) {\n      return \"null\";\n    }\n    return o.toString().replace(\"\\n\", \"\\n    \");\n  }\n}\n\n
+===================================================================
+diff --git a/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/model/UserResponse.java b/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/model/UserResponse.java
+--- a/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/model/UserResponse.java	
++++ b/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/model/UserResponse.java	
+@@ -18,7 +18,7 @@
+  * UserResponse
+  */
+ 
+-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-12-30T19:10:08.868729+01:00[Europe/Rome]", comments = "Generator version: 7.5.0")
++@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-19T09:38:47.571521+01:00[Europe/Rome]", comments = "Generator version: 7.5.0")
+ public class UserResponse {
+ 
+   private Long id;
+Index: core-service/target/generated-sources/openapi/src/main/java/com/example/generated/model/CreateUserRequest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.generated.model;\n\nimport java.net.URI;\nimport java.util.Objects;\nimport com.fasterxml.jackson.annotation.JsonProperty;\nimport com.fasterxml.jackson.annotation.JsonCreator;\nimport org.openapitools.jackson.nullable.JsonNullable;\nimport java.time.OffsetDateTime;\nimport jakarta.validation.Valid;\nimport jakarta.validation.constraints.*;\nimport io.swagger.v3.oas.annotations.media.Schema;\n\n\nimport java.util.*;\nimport jakarta.annotation.Generated;\n\n/**\n * CreateUserRequest\n */\n\n@Generated(value = \"org.openapitools.codegen.languages.SpringCodegen\", date = \"2025-12-30T19:10:08.868729+01:00[Europe/Rome]\", comments = \"Generator version: 7.5.0\")\npublic class CreateUserRequest {\n\n  private String email;\n\n  private String fullName;\n\n  public CreateUserRequest() {\n    super();\n  }\n\n  /**\n   * Constructor with only required parameters\n   */\n  public CreateUserRequest(String email, String fullName) {\n    this.email = email;\n    this.fullName = fullName;\n  }\n\n  public CreateUserRequest email(String email) {\n    this.email = email;\n    return this;\n  }\n\n  /**\n   * Get email\n   * @return email\n  */\n  @NotNull @jakarta.validation.constraints.Email \n  @Schema(name = \"email\", requiredMode = Schema.RequiredMode.REQUIRED)\n  @JsonProperty(\"email\")\n  public String getEmail() {\n    return email;\n  }\n\n  public void setEmail(String email) {\n    this.email = email;\n  }\n\n  public CreateUserRequest fullName(String fullName) {\n    this.fullName = fullName;\n    return this;\n  }\n\n  /**\n   * Get fullName\n   * @return fullName\n  */\n  @NotNull \n  @Schema(name = \"fullName\", requiredMode = Schema.RequiredMode.REQUIRED)\n  @JsonProperty(\"fullName\")\n  public String getFullName() {\n    return fullName;\n  }\n\n  public void setFullName(String fullName) {\n    this.fullName = fullName;\n  }\n\n  @Override\n  public boolean equals(Object o) {\n    if (this == o) {\n      return true;\n    }\n    if (o == null || getClass() != o.getClass()) {\n      return false;\n    }\n    CreateUserRequest createUserRequest = (CreateUserRequest) o;\n    return Objects.equals(this.email, createUserRequest.email) &&\n        Objects.equals(this.fullName, createUserRequest.fullName);\n  }\n\n  @Override\n  public int hashCode() {\n    return Objects.hash(email, fullName);\n  }\n\n  @Override\n  public String toString() {\n    StringBuilder sb = new StringBuilder();\n    sb.append(\"class CreateUserRequest {\\n\");\n    sb.append(\"    email: \").append(toIndentedString(email)).append(\"\\n\");\n    sb.append(\"    fullName: \").append(toIndentedString(fullName)).append(\"\\n\");\n    sb.append(\"}\");\n    return sb.toString();\n  }\n\n  /**\n   * Convert the given object to string with each line indented by 4 spaces\n   * (except the first line).\n   */\n  private String toIndentedString(Object o) {\n    if (o == null) {\n      return \"null\";\n    }\n    return o.toString().replace(\"\\n\", \"\\n    \");\n  }\n}\n\n
+===================================================================
+diff --git a/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/model/CreateUserRequest.java b/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/model/CreateUserRequest.java
+--- a/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/model/CreateUserRequest.java	
++++ b/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/model/CreateUserRequest.java	
+@@ -18,7 +18,7 @@
+  * CreateUserRequest
+  */
+ 
+-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-12-30T19:10:08.868729+01:00[Europe/Rome]", comments = "Generator version: 7.5.0")
++@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-19T09:38:47.571521+01:00[Europe/Rome]", comments = "Generator version: 7.5.0")
+ public class CreateUserRequest {
+ 
+   private String email;
+Index: core-service/target/generated-sources/openapi/src/main/java/com/example/generated/api/UsersApi.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/**\n * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech) (7.5.0).\n * https://openapi-generator.tech\n * Do not edit the class manually.\n */\npackage com.example.generated.api;\n\nimport com.example.generated.model.CreateUserRequest;\nimport com.example.generated.model.UserResponse;\nimport io.swagger.v3.oas.annotations.ExternalDocumentation;\nimport io.swagger.v3.oas.annotations.Operation;\nimport io.swagger.v3.oas.annotations.Parameter;\nimport io.swagger.v3.oas.annotations.Parameters;\nimport io.swagger.v3.oas.annotations.media.ArraySchema;\nimport io.swagger.v3.oas.annotations.media.Content;\nimport io.swagger.v3.oas.annotations.media.Schema;\nimport io.swagger.v3.oas.annotations.responses.ApiResponse;\nimport io.swagger.v3.oas.annotations.security.SecurityRequirement;\nimport io.swagger.v3.oas.annotations.tags.Tag;\nimport io.swagger.v3.oas.annotations.enums.ParameterIn;\nimport org.springframework.http.HttpStatus;\nimport org.springframework.http.MediaType;\nimport org.springframework.http.ResponseEntity;\nimport org.springframework.validation.annotation.Validated;\nimport org.springframework.web.bind.annotation.*;\nimport org.springframework.web.context.request.NativeWebRequest;\nimport org.springframework.web.multipart.MultipartFile;\n\nimport jakarta.validation.Valid;\nimport jakarta.validation.constraints.*;\nimport java.util.List;\nimport java.util.Map;\nimport java.util.Optional;\nimport jakarta.annotation.Generated;\n\n@Generated(value = \"org.openapitools.codegen.languages.SpringCodegen\", date = \"2025-12-30T19:10:08.868729+01:00[Europe/Rome]\", comments = \"Generator version: 7.5.0\")\n@Validated\n@Tag(name = \"Users\", description = \"the Users API\")\npublic interface UsersApi {\n\n    /**\n     * POST /api/v1/users\n     *\n     * @param createUserRequest  (required)\n     * @return Created (status code 201)\n     */\n    @Operation(\n        operationId = \"createUser\",\n        tags = { \"Users\" },\n        responses = {\n            @ApiResponse(responseCode = \"201\", description = \"Created\", content = {\n                @Content(mediaType = \"application/json\", schema = @Schema(implementation = UserResponse.class))\n            })\n        }\n    )\n    @RequestMapping(\n        method = RequestMethod.POST,\n        value = \"/api/v1/users\",\n        produces = { \"application/json\" },\n        consumes = { \"application/json\" }\n    )\n    \n    ResponseEntity<UserResponse> createUser(\n        @Parameter(name = \"CreateUserRequest\", description = \"\", required = true) @Valid @RequestBody CreateUserRequest createUserRequest\n    ) throws Exception;\n\n\n    /**\n     * GET /api/v1/users/{id}\n     *\n     * @param id ID dell&#39;utente (required)\n     * @return Utente trovato (status code 200)\n     *         or Utente non trovato (status code 404)\n     */\n    @Operation(\n        operationId = \"getUser\",\n        tags = { \"Users\" },\n        responses = {\n            @ApiResponse(responseCode = \"200\", description = \"Utente trovato\", content = {\n                @Content(mediaType = \"application/json\", schema = @Schema(implementation = UserResponse.class))\n            }),\n            @ApiResponse(responseCode = \"404\", description = \"Utente non trovato\")\n        }\n    )\n    @RequestMapping(\n        method = RequestMethod.GET,\n        value = \"/api/v1/users/{id}\",\n        produces = { \"application/json\" }\n    )\n    \n    ResponseEntity<UserResponse> getUser(\n        @Parameter(name = \"id\", description = \"ID dell'utente\", required = true, in = ParameterIn.PATH) @PathVariable(\"id\") Long id\n    ) throws Exception;\n\n}\n
+===================================================================
+diff --git a/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/api/UsersApi.java b/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/api/UsersApi.java
+--- a/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/api/UsersApi.java	
++++ b/core-service/target/generated-sources/openapi/src/main/java/com/example/generated/api/UsersApi.java	
+@@ -33,7 +33,7 @@
+ import java.util.Optional;
+ import jakarta.annotation.Generated;
+ 
+-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-12-30T19:10:08.868729+01:00[Europe/Rome]", comments = "Generator version: 7.5.0")
++@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-19T09:38:47.571521+01:00[Europe/Rome]", comments = "Generator version: 7.5.0")
+ @Validated
+ @Tag(name = "Users", description = "the Users API")
+ public interface UsersApi {

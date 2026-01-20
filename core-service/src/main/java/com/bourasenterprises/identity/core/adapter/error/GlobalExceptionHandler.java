@@ -8,6 +8,8 @@ import com.bourasenterprises.identity.core.domain.exception.ErrorCode;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -46,6 +48,26 @@ public class GlobalExceptionHandler {
             
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex) {
+        ApiErrorResponse error = baseError(
+                HttpStatus.FORBIDDEN,
+                "ACCESS_DENIED",
+                "You do not have the required roles to access this resource. Please contact your administrator."
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Object> handleAuthenticationException(AuthenticationException ex) {
+        ApiErrorResponse error = baseError(
+                HttpStatus.UNAUTHORIZED,
+                "UNAUTHENTICATED",
+                "Full authentication is required to access this resource. Check if your token is missing, invalid or expired."
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGeneric(Exception ex){
         ApiErrorResponse error = baseError(
@@ -53,7 +75,7 @@ public class GlobalExceptionHandler {
             "INTERNAL_ERROR", 
             "Unexpected Error"
         );
-
+        ex.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);    
 
     }

@@ -1,0 +1,1073 @@
+Index: core-service/src/main/resources/openapi/users-api.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>openapi: 3.0.3\ninfo:\n  title: Users API\n  version: 1.0.0\n\npaths:\n  /api/v1/users:\n    post:\n      tags:\n        - Users\n      operationId: createUser\n      requestBody:\n        required: true\n        content:\n          application/json:\n            schema:\n              $ref: '#/components/schemas/CreateUserRequest'\n      responses:\n        '201':\n          description: Created\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/UserResponse'\n\n  /api/v1/users/{id}:\n    get:\n      tags:\n        - Users\n      operationId: getUser\n      parameters: # <--- CORRETTO (era paramenters)\n        - name: id\n          in: path\n          required: true\n          description: ID dell'utente\n          schema:\n            type: integer\n            format: int64\n      responses:\n        '200':\n          description: Utente trovato\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/UserResponse'\n        '404':\n          description: Utente non trovato\n\ncomponents:\n  schemas:\n    CreateUserRequest:\n      type: object\n      required: [email, fullName]\n      properties:\n        email:\n          type: string\n          format: email\n        fullName:\n          type: string\n    \n    UserResponse:\n      type: object\n      properties:\n        id:\n          type: integer\n          format: int64\n        email:\n          type: string\n        fullName:\n          type: string\n        active:\n          type: boolean
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/core-service/src/main/resources/openapi/users-api.yaml b/core-service/src/main/resources/openapi/users-api.yaml
+--- a/core-service/src/main/resources/openapi/users-api.yaml	
++++ b/core-service/src/main/resources/openapi/users-api.yaml	
+@@ -64,6 +64,9 @@
+         id:
+           type: integer
+           format: int64
++        keycloakId:
++          type: string
++          format: uuid
+         email:
+           type: string
+         fullName:
+Index: core-service/src/main/java/com/bourasenterprises/identity/core/domain/exception/ErrorCode.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.bourasenterprises.identity.core.domain.exception;\n\nimport lombok.Getter;\nimport lombok.RequiredArgsConstructor;\nimport org.springframework.http.HttpStatus;\n\n@Getter\n@RequiredArgsConstructor\npublic enum ErrorCode {\n    USER_NOT_FOUND(\"USER_001\", \"Utente non trovato\", HttpStatus.NOT_FOUND),\n    EMAIL_ALREADY_EXISTS(\"USER_002\", \"Email già registrata\", HttpStatus.CONFLICT),\n    INVALID_PERMISSION(\"AUTH_001\", \"Permessi insufficienti\", HttpStatus.FORBIDDEN);\n\n    private final String code;\n    private final String defaultMessage;\n    private final HttpStatus status;\n\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/core-service/src/main/java/com/bourasenterprises/identity/core/domain/exception/ErrorCode.java b/core-service/src/main/java/com/bourasenterprises/identity/core/domain/exception/ErrorCode.java
+--- a/core-service/src/main/java/com/bourasenterprises/identity/core/domain/exception/ErrorCode.java	
++++ b/core-service/src/main/java/com/bourasenterprises/identity/core/domain/exception/ErrorCode.java	
+@@ -9,7 +9,8 @@
+ public enum ErrorCode {
+     USER_NOT_FOUND("USER_001", "Utente non trovato", HttpStatus.NOT_FOUND),
+     EMAIL_ALREADY_EXISTS("USER_002", "Email già registrata", HttpStatus.CONFLICT),
+-    INVALID_PERMISSION("AUTH_001", "Permessi insufficienti", HttpStatus.FORBIDDEN);
++    INVALID_PERMISSION("AUTH_001", "Permessi insufficienti", HttpStatus.FORBIDDEN),
++    INTERNAL_ERROR("AUTH_002", "Errore durante la creazione su Keycloak", HttpStatus.INTERNAL_SERVER_ERROR);
+ 
+     private final String code;
+     private final String defaultMessage;
+Index: core-service/pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n    <modelVersion>4.0.0</modelVersion>\n\n    <parent>\n        <groupId>com.bourasenterprises.identity</groupId>\n        <artifactId>enterprise-identity-platform</artifactId>\n        <version>1.0.0-SNAPSHOT</version>\n    </parent>\n\n    <artifactId>core-service</artifactId>\n\n    <dependencies>\n        <!-- REST -->\n        <dependency>\n            <groupId>org.springframework.boot</groupId>\n            <artifactId>spring-boot-starter-web</artifactId>\n            <version>${spring.boot.version}</version>\n        </dependency>\n\n        <!-- JPA -->\n        <dependency>\n            <groupId>org.springframework.boot</groupId>\n            <artifactId>spring-boot-starter-data-jpa</artifactId>\n            <version>${spring.boot.version}</version>\n        </dependency>\n\n        <!-- H2 (Oracle-like for dev) -->\n        <dependency>\n            <groupId>com.h2database</groupId>\n            <artifactId>h2</artifactId>\n            <version>2.4.240</version>\n            <scope>runtime</scope>\n        </dependency>\n\n        <!-- Flyway -->\n        <dependency>\n            <groupId>org.flywaydb</groupId>\n            <artifactId>flyway-core</artifactId>\n            <version>11.20.0</version>\n        </dependency>\n\n        <!-- Validation -->\n        <dependency>\n            <groupId>org.springframework.boot</groupId>\n            <artifactId>spring-boot-starter-validation</artifactId>\n            <version>${spring.boot.version}</version>\n        </dependency>\n\n        <!-- Mapstruct-->\n        <dependency>\n            <groupId>org.mapstruct</groupId>\n            <artifactId>mapstruct</artifactId>\n            <version>1.5.5.Final</version>\n        </dependency>\n\n        <!-- lombok -->\n        <dependency>\n            <groupId>org.projectlombok</groupId>\n            <artifactId>lombok</artifactId>\n            <version>1.18.42</version>\n        </dependency>\n\n        <dependency>\n            <groupId>org.springdoc</groupId>\n            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>\n            <version>2.5.0</version>\n        </dependency>\n\n        <dependency>\n            <groupId>org.openapitools</groupId>\n            <artifactId>jackson-databind-nullable</artifactId>\n            <version>0.2.6</version>\n        </dependency>\n    </dependencies>\n\n    <build>\n        <plugins>\n            <!-- Lombok & Mapstruct binding-->\n            <plugin>\n                <groupId>org.apache.maven.plugins</groupId>\n                <artifactId>maven-compiler-plugin</artifactId>\n                <version>3.11.0</version>\n                <configuration>\n                    <source>17</source> <target>17</target>\n                    <parameters>true</parameters>\n                    <annotationProcessorPaths>\n                        <path>\n                            <groupId>org.projectlombok</groupId>\n                            <artifactId>lombok</artifactId>\n                            <version>1.18.30</version>\n                        </path>\n                        <path>\n                            <groupId>org.projectlombok</groupId>\n                            <artifactId>lombok-mapstruct-binding</artifactId>\n                            <version>0.2.0</version>\n                        </path>\n                        <path>\n                            <groupId>org.mapstruct</groupId>\n                            <artifactId>mapstruct-processor</artifactId>\n                            <version>1.5.5.Final</version>\n                        </path>\n                    </annotationProcessorPaths>\n                </configuration>\n            </plugin>\n\n            <!--SpringBoot: RUN-->\n            <plugin>\n                <groupId>org.springframework.boot</groupId>\n                <artifactId>spring-boot-maven-plugin</artifactId>\n                <version>${spring.boot.version}</version>\n                <executions>\n                    <execution>\n                        <goals>\n                            <goal>repackage</goal>\n                        </goals>\n                    </execution>\n                </executions>\n            </plugin>\n\n            <!-- OPENAPI-->\n            <plugin>\n                <groupId>org.openapitools</groupId>\n                <artifactId>openapi-generator-maven-plugin</artifactId>\n                <version>7.5.0</version>\n                <executions>\n                    <execution>\n                        <id>generate-api</id>\n                        <phase>generate-sources</phase>\n                        <goals>\n                            <goal>generate</goal>\n                        </goals>\n                        <configuration>\n                            <inputSpec>${project.basedir}/src/main/resources/openapi/users-api.yaml</inputSpec>\n                            <generatorName>spring</generatorName>\n                            <apiPackage>com.example.generated.api</apiPackage>\n                            <modelPackage>com.example.generated.model</modelPackage>\n                            \n                            <configOptions>\n                                <useTags>true</useTags>\n                                <interfaceOnly>true</interfaceOnly>\n                                <useSpringBoot3>true</useSpringBoot3>\n                                <useJakartaEe>true</useJakartaEe> <unhandledException>true</unhandledException>\n                                <skipDefaultInterface>true</skipDefaultInterface>\n                                <generatedAnnotation>false</generatedAnnotation> </configOptions>\n                        </configuration>\n                    </execution>\n                </executions>\n            </plugin>\n\n        </plugins>\n    </build>\n    \n\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/core-service/pom.xml b/core-service/pom.xml
+--- a/core-service/pom.xml	
++++ b/core-service/pom.xml	
+@@ -10,54 +10,60 @@
+     <artifactId>core-service</artifactId>
+ 
+     <dependencies>
+-        <!-- REST -->
++        <dependency>
++            <groupId>net.logstash.logback</groupId>
++            <artifactId>logstash-logback-encoder</artifactId>
++            <version>7.4</version>
++        </dependency>
++
+         <dependency>
+             <groupId>org.springframework.boot</groupId>
+             <artifactId>spring-boot-starter-web</artifactId>
+-            <version>${spring.boot.version}</version>
+         </dependency>
+-
+-        <!-- JPA -->
+         <dependency>
+             <groupId>org.springframework.boot</groupId>
+             <artifactId>spring-boot-starter-data-jpa</artifactId>
+-            <version>${spring.boot.version}</version>
++        </dependency>
++        <dependency>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter-validation</artifactId>
+         </dependency>
+-
+-        <!-- H2 (Oracle-like for dev) -->
+         <dependency>
+-            <groupId>com.h2database</groupId>
+-            <artifactId>h2</artifactId>
+-            <version>2.4.240</version>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
++        </dependency>
++
++        <dependency>
++            <groupId>org.springframework.kafka</groupId>
++            <artifactId>spring-kafka</artifactId>
++        </dependency>
++
++        <dependency>
++            <groupId>org.postgresql</groupId>
++            <artifactId>postgresql</artifactId>
+             <scope>runtime</scope>
+         </dependency>
+ 
+-        <!-- Flyway -->
+         <dependency>
+             <groupId>org.flywaydb</groupId>
+             <artifactId>flyway-core</artifactId>
+-            <version>11.20.0</version>
++            <version>10.4.1</version>
+         </dependency>
+-
+-        <!-- Validation -->
+         <dependency>
+-            <groupId>org.springframework.boot</groupId>
+-            <artifactId>spring-boot-starter-validation</artifactId>
+-            <version>${spring.boot.version}</version>
++            <groupId>org.flywaydb</groupId>
++            <artifactId>flyway-database-postgresql</artifactId>
++            <version>10.4.1</version>
+         </dependency>
+ 
+-        <!-- Mapstruct-->
+         <dependency>
+             <groupId>org.mapstruct</groupId>
+             <artifactId>mapstruct</artifactId>
+             <version>1.5.5.Final</version>
+         </dependency>
+-
+-        <!-- lombok -->
+         <dependency>
+             <groupId>org.projectlombok</groupId>
+             <artifactId>lombok</artifactId>
+-            <version>1.18.42</version>
++            <version>1.18.30</version>
+         </dependency>
+ 
+         <dependency>
+@@ -65,23 +71,28 @@
+             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+             <version>2.5.0</version>
+         </dependency>
+-
+         <dependency>
+             <groupId>org.openapitools</groupId>
+             <artifactId>jackson-databind-nullable</artifactId>
+             <version>0.2.6</version>
+         </dependency>
++
++        <dependency>
++            <groupId>org.keycloak</groupId>
++            <artifactId>keycloak-admin-client</artifactId>
++            <version>22.0.0</version>
++        </dependency>
+     </dependencies>
+ 
+     <build>
+         <plugins>
+-            <!-- Lombok & Mapstruct binding-->
+             <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-compiler-plugin</artifactId>
+                 <version>3.11.0</version>
+                 <configuration>
+-                    <source>17</source> <target>17</target>
++                    <source>17</source>
++                    <target>17</target>
+                     <parameters>true</parameters>
+                     <annotationProcessorPaths>
+                         <path>
+@@ -103,21 +114,11 @@
+                 </configuration>
+             </plugin>
+ 
+-            <!--SpringBoot: RUN-->
+             <plugin>
+                 <groupId>org.springframework.boot</groupId>
+                 <artifactId>spring-boot-maven-plugin</artifactId>
+-                <version>${spring.boot.version}</version>
+-                <executions>
+-                    <execution>
+-                        <goals>
+-                            <goal>repackage</goal>
+-                        </goals>
+-                    </execution>
+-                </executions>
+             </plugin>
+ 
+-            <!-- OPENAPI-->
+             <plugin>
+                 <groupId>org.openapitools</groupId>
+                 <artifactId>openapi-generator-maven-plugin</artifactId>
+@@ -134,21 +135,19 @@
+                             <generatorName>spring</generatorName>
+                             <apiPackage>com.example.generated.api</apiPackage>
+                             <modelPackage>com.example.generated.model</modelPackage>
+-                            
+                             <configOptions>
+                                 <useTags>true</useTags>
+                                 <interfaceOnly>true</interfaceOnly>
+                                 <useSpringBoot3>true</useSpringBoot3>
+-                                <useJakartaEe>true</useJakartaEe> <unhandledException>true</unhandledException>
++                                <useJakartaEe>true</useJakartaEe>
++                                <unhandledException>true</unhandledException>
+                                 <skipDefaultInterface>true</skipDefaultInterface>
+-                                <generatedAnnotation>false</generatedAnnotation> </configOptions>
++                                <generatedAnnotation>false</generatedAnnotation>
++                            </configOptions>
+                         </configuration>
+                     </execution>
+                 </executions>
+             </plugin>
+-
+         </plugins>
+     </build>
+-    
+-
+ </project>
+\ No newline at end of file
+Index: core-service/src/main/java/com/bourasenterprises/identity/core/service/UserService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.bourasenterprises.identity.core.service;\n\nimport com.bourasenterprises.identity.core.domain.exception.BusinessException;\nimport com.bourasenterprises.identity.core.domain.exception.ErrorCode;\nimport org.springframework.stereotype.Service;\n\nimport com.bourasenterprises.identity.core.domain.UserEntity;\nimport com.bourasenterprises.identity.core.repository.UserRepository;\n\nimport jakarta.transaction.Transactional;\nimport lombok.RequiredArgsConstructor;\n\n@Service\n@RequiredArgsConstructor\npublic class UserService {\n\n    private final UserRepository repository;\n\n    @Transactional\n    public UserEntity createUser(UserEntity userRequest){\n\n        repository.findByEmail(userRequest.getEmail())\n            .ifPresent(u -> {\n                throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS, \"La mail \" + u.getEmail() + \" è già registrata\");\n            });\n        \n        UserEntity userEntity = UserEntity.builder()\n            .email(userRequest.getEmail())\n            .fullName(userRequest.getFullName())\n            .build();\n        \n        return repository.save(userEntity);\n    }\n\n    public UserEntity getUser(Long id){\n        return repository.findById(id)\n            .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, \"Utente non trovato con ID: \" + id));\n    }\n    \n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/core-service/src/main/java/com/bourasenterprises/identity/core/service/UserService.java b/core-service/src/main/java/com/bourasenterprises/identity/core/service/UserService.java
+--- a/core-service/src/main/java/com/bourasenterprises/identity/core/service/UserService.java	
++++ b/core-service/src/main/java/com/bourasenterprises/identity/core/service/UserService.java	
+@@ -2,6 +2,10 @@
+ 
+ import com.bourasenterprises.identity.core.domain.exception.BusinessException;
+ import com.bourasenterprises.identity.core.domain.exception.ErrorCode;
++import jakarta.ws.rs.core.Response;
++import org.keycloak.admin.client.CreatedResponseUtil;
++import org.keycloak.admin.client.Keycloak;
++import org.keycloak.representations.idm.UserRepresentation;
+ import org.springframework.stereotype.Service;
+ 
+ import com.bourasenterprises.identity.core.domain.UserEntity;
+@@ -15,26 +19,47 @@
+ public class UserService {
+ 
+     private final UserRepository repository;
++    private final Keycloak keycloak;
+ 
+     @Transactional
+     public UserEntity createUser(UserEntity userRequest){
+ 
+         repository.findByEmail(userRequest.getEmail())
+-            .ifPresent(u -> {
+-                throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS, "La mail " + u.getEmail() + " è già registrata");
+-            });
+-        
++                .ifPresent(u -> {
++                    throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS, "Email già presente");
++                });
++
++        // CREAZIONE SU KEYCLOAK
++        UserRepresentation kcUser = new UserRepresentation();
++        kcUser.setUsername(userRequest.getEmail());
++        kcUser.setEmail(userRequest.getEmail());
++        kcUser.setFirstName(userRequest.getFullName());
++        kcUser.setEnabled(true);
++
++        // TODO: Qui andrebbe aggiunta la gestione password (es. invio email reset o password provvisoria)
++
++        Response response = keycloak.realm("enterprise-platform").users().create(kcUser);
++
++        if (response.getStatus() != 201) {
++            throw new BusinessException(ErrorCode.INTERNAL_ERROR, "Errore durante la creazione su Keycloak");
++        }
++
++        // RECUPERO UUID DA KEYCLOAK
++        String keycloakId = CreatedResponseUtil.getCreatedId(response);
++
+         UserEntity userEntity = UserEntity.builder()
+-            .email(userRequest.getEmail())
+-            .fullName(userRequest.getFullName())
+-            .build();
+-        
++                .keycloakId(java.util.UUID.fromString(keycloakId))
++                .email(userRequest.getEmail())
++                .fullName(userRequest.getFullName())
++                .role("OPERATOR")
++                .active(true)
++                .build();
++
+         return repository.save(userEntity);
+     }
+ 
+     public UserEntity getUser(Long id){
+         return repository.findById(id)
+-            .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "Utente non trovato con ID: " + id));
++                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "ID non trovato: " + id));
+     }
+-    
+ }
+Index: core-service/src/main/java/com/bourasenterprises/identity/core/application/UserApplicationService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.bourasenterprises.identity.core.application;\n\nimport org.springframework.stereotype.Service;\n\nimport com.bourasenterprises.identity.core.domain.UserEntity;\nimport com.bourasenterprises.identity.core.mapper.UserMapper;\nimport com.bourasenterprises.identity.core.service.UserService;\nimport com.example.generated.model.CreateUserRequest;\nimport com.example.generated.model.UserResponse;\n\nimport lombok.RequiredArgsConstructor;\n\n@Service\n@RequiredArgsConstructor\npublic class UserApplicationService {\n\n    private final UserService service;\n    private final UserMapper mapper;\n\n    public UserResponse createUser(CreateUserRequest request){\n        UserEntity entity = mapper.toEntity(request);\n        return mapper.toResponse(service.createUser(entity));\n    }\n\n    public UserResponse getUser(Long id){\n        return mapper.toResponse(service.getUser(id));\n    }\n    \n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/core-service/src/main/java/com/bourasenterprises/identity/core/application/UserApplicationService.java b/core-service/src/main/java/com/bourasenterprises/identity/core/application/UserApplicationService.java
+--- a/core-service/src/main/java/com/bourasenterprises/identity/core/application/UserApplicationService.java	
++++ b/core-service/src/main/java/com/bourasenterprises/identity/core/application/UserApplicationService.java	
+@@ -1,5 +1,7 @@
+ package com.bourasenterprises.identity.core.application;
+ 
++import lombok.extern.slf4j.Slf4j;
++import org.springframework.security.access.prepost.PreAuthorize;
+ import org.springframework.stereotype.Service;
+ 
+ import com.bourasenterprises.identity.core.domain.UserEntity;
+@@ -10,6 +12,7 @@
+ 
+ import lombok.RequiredArgsConstructor;
+ 
++@Slf4j
+ @Service
+ @RequiredArgsConstructor
+ public class UserApplicationService {
+@@ -18,12 +21,19 @@
+     private final UserMapper mapper;
+ 
+     public UserResponse createUser(CreateUserRequest request){
++        log.info("Inizio funnel registrazione per email: {}", request.getEmail());
+         UserEntity entity = mapper.toEntity(request);
+-        return mapper.toResponse(service.createUser(entity));
++
++        UserEntity savedEntity = service.createUser(entity);
++
++        UserResponse response = mapper.toResponse(savedEntity);
++        log.info("Operatore creato con successo. Database ID: {}, Keycloak ID: {}",
++                response.getId(), savedEntity.getKeycloakId());
++        return response;
+     }
+ 
++    @PreAuthorize("hasRole('ADMIN') || hasRole('OPERATOR')")
+     public UserResponse getUser(Long id){
+         return mapper.toResponse(service.getUser(id));
+     }
+-    
+-}
++}
+\ No newline at end of file
+Index: core-service/src/main/java/com/bourasenterprises/identity/core/domain/UserEntity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.bourasenterprises.identity.core.domain;\n\nimport jakarta.persistence.Column;\nimport jakarta.persistence.Entity;\nimport jakarta.persistence.GeneratedValue;\nimport jakarta.persistence.GenerationType;\nimport jakarta.persistence.Id;\nimport jakarta.persistence.Table;\nimport lombok.AllArgsConstructor;\nimport lombok.Builder;\nimport lombok.Data;\nimport lombok.NoArgsConstructor;\n\n@Entity\n@Table(name = \"users\")\n@Data\n@AllArgsConstructor\n@NoArgsConstructor\n@Builder\npublic class UserEntity {\n    \n    @Id\n    @GeneratedValue(strategy = GenerationType.IDENTITY)\n    @Column(name = \"id\", columnDefinition = \"NUMBER(19,0)\")\n    private Long id;\n\n    @Column(nullable = false, unique = true, name = \"email\")\n    private String email;\n\n    @Column(nullable = false, name = \"full_name\")\n    private String fullName;\n\n    @Column(name = \"ACTIVE\", nullable = true)\n    private Boolean active;\n\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/core-service/src/main/java/com/bourasenterprises/identity/core/domain/UserEntity.java b/core-service/src/main/java/com/bourasenterprises/identity/core/domain/UserEntity.java
+--- a/core-service/src/main/java/com/bourasenterprises/identity/core/domain/UserEntity.java	
++++ b/core-service/src/main/java/com/bourasenterprises/identity/core/domain/UserEntity.java	
+@@ -11,6 +11,8 @@
+ import lombok.Data;
+ import lombok.NoArgsConstructor;
+ 
++import java.util.UUID;
++
+ @Entity
+ @Table(name = "users")
+ @Data
+@@ -18,19 +20,21 @@
+ @NoArgsConstructor
+ @Builder
+ public class UserEntity {
+-    
++
+     @Id
+     @GeneratedValue(strategy = GenerationType.IDENTITY)
+-    @Column(name = "id", columnDefinition = "NUMBER(19,0)")
+     private Long id;
+ 
+-    @Column(nullable = false, unique = true, name = "email")
++    @Column(name = "keycloak_id", nullable = false, unique = true)
++    private UUID keycloakId;
++
++    @Column(nullable = false, unique = true)
+     private String email;
+ 
+-    @Column(nullable = false, name = "full_name")
+     private String fullName;
+ 
+-    @Column(name = "ACTIVE", nullable = true)
+-    private Boolean active;
++    private String role = "OPERATOR"; // Default per il funnel
++
++    private boolean active = true;
+ 
+ }
+Index: core-service/src/main/java/com/bourasenterprises/identity/core/mapper/UserMapper.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.bourasenterprises.identity.core.mapper;\n\nimport org.mapstruct.Mapper;\n\nimport com.bourasenterprises.identity.core.domain.UserEntity;\nimport com.example.generated.model.CreateUserRequest;\nimport com.example.generated.model.UserResponse;\n\n@Mapper(componentModel = \"spring\")\npublic interface UserMapper {\n\n    UserEntity toEntity(CreateUserRequest request);\n\n    UserResponse toResponse(UserEntity entity);\n    \n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/core-service/src/main/java/com/bourasenterprises/identity/core/mapper/UserMapper.java b/core-service/src/main/java/com/bourasenterprises/identity/core/mapper/UserMapper.java
+--- a/core-service/src/main/java/com/bourasenterprises/identity/core/mapper/UserMapper.java	
++++ b/core-service/src/main/java/com/bourasenterprises/identity/core/mapper/UserMapper.java	
+@@ -1,7 +1,7 @@
+ package com.bourasenterprises.identity.core.mapper;
+ 
+ import org.mapstruct.Mapper;
+-
++import org.mapstruct.Mapping;
+ import com.bourasenterprises.identity.core.domain.UserEntity;
+ import com.example.generated.model.CreateUserRequest;
+ import com.example.generated.model.UserResponse;
+@@ -9,8 +9,13 @@
+ @Mapper(componentModel = "spring")
+ public interface UserMapper {
+ 
++    // L'id è autoincrementale del DB, il keycloakId lo mettiamo noi nel Service
++    @Mapping(target = "id", ignore = true)
++    @Mapping(target = "keycloakId", ignore = true)
++    // Ignoriamo i campi che non arrivano dal frontend
++    @Mapping(target = "role", ignore = true)
++    @Mapping(target = "active", ignore = true)
+     UserEntity toEntity(CreateUserRequest request);
+ 
+     UserResponse toResponse(UserEntity entity);
+-    
+-}
++}
+\ No newline at end of file
+Index: .idea/uiDesigner.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/uiDesigner.xml b/.idea/uiDesigner.xml
+new file mode 100644
+--- /dev/null	
++++ b/.idea/uiDesigner.xml	
+@@ -0,0 +1,124 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="Palette2">
++    <group name="Swing">
++      <item class="com.intellij.uiDesigner.HSpacer" tooltip-text="Horizontal Spacer" icon="/com/intellij/uiDesigner/icons/hspacer.svg" removable="false" auto-create-binding="false" can-attach-label="false">
++        <default-constraints vsize-policy="1" hsize-policy="6" anchor="0" fill="1" />
++      </item>
++      <item class="com.intellij.uiDesigner.VSpacer" tooltip-text="Vertical Spacer" icon="/com/intellij/uiDesigner/icons/vspacer.svg" removable="false" auto-create-binding="false" can-attach-label="false">
++        <default-constraints vsize-policy="6" hsize-policy="1" anchor="0" fill="2" />
++      </item>
++      <item class="javax.swing.JPanel" icon="/com/intellij/uiDesigner/icons/panel.svg" removable="false" auto-create-binding="false" can-attach-label="false">
++        <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="3" />
++      </item>
++      <item class="javax.swing.JScrollPane" icon="/com/intellij/uiDesigner/icons/scrollPane.svg" removable="false" auto-create-binding="false" can-attach-label="true">
++        <default-constraints vsize-policy="7" hsize-policy="7" anchor="0" fill="3" />
++      </item>
++      <item class="javax.swing.JButton" icon="/com/intellij/uiDesigner/icons/button.svg" removable="false" auto-create-binding="true" can-attach-label="false">
++        <default-constraints vsize-policy="0" hsize-policy="3" anchor="0" fill="1" />
++        <initial-values>
++          <property name="text" value="Button" />
++        </initial-values>
++      </item>
++      <item class="javax.swing.JRadioButton" icon="/com/intellij/uiDesigner/icons/radioButton.svg" removable="false" auto-create-binding="true" can-attach-label="false">
++        <default-constraints vsize-policy="0" hsize-policy="3" anchor="8" fill="0" />
++        <initial-values>
++          <property name="text" value="RadioButton" />
++        </initial-values>
++      </item>
++      <item class="javax.swing.JCheckBox" icon="/com/intellij/uiDesigner/icons/checkBox.svg" removable="false" auto-create-binding="true" can-attach-label="false">
++        <default-constraints vsize-policy="0" hsize-policy="3" anchor="8" fill="0" />
++        <initial-values>
++          <property name="text" value="CheckBox" />
++        </initial-values>
++      </item>
++      <item class="javax.swing.JLabel" icon="/com/intellij/uiDesigner/icons/label.svg" removable="false" auto-create-binding="false" can-attach-label="false">
++        <default-constraints vsize-policy="0" hsize-policy="0" anchor="8" fill="0" />
++        <initial-values>
++          <property name="text" value="Label" />
++        </initial-values>
++      </item>
++      <item class="javax.swing.JTextField" icon="/com/intellij/uiDesigner/icons/textField.svg" removable="false" auto-create-binding="true" can-attach-label="true">
++        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
++          <preferred-size width="150" height="-1" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JPasswordField" icon="/com/intellij/uiDesigner/icons/passwordField.svg" removable="false" auto-create-binding="true" can-attach-label="true">
++        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
++          <preferred-size width="150" height="-1" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JFormattedTextField" icon="/com/intellij/uiDesigner/icons/formattedTextField.svg" removable="false" auto-create-binding="true" can-attach-label="true">
++        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
++          <preferred-size width="150" height="-1" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JTextArea" icon="/com/intellij/uiDesigner/icons/textArea.svg" removable="false" auto-create-binding="true" can-attach-label="true">
++        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
++          <preferred-size width="150" height="50" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JTextPane" icon="/com/intellij/uiDesigner/icons/textPane.svg" removable="false" auto-create-binding="true" can-attach-label="true">
++        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
++          <preferred-size width="150" height="50" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JEditorPane" icon="/com/intellij/uiDesigner/icons/editorPane.svg" removable="false" auto-create-binding="true" can-attach-label="true">
++        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
++          <preferred-size width="150" height="50" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JComboBox" icon="/com/intellij/uiDesigner/icons/comboBox.svg" removable="false" auto-create-binding="true" can-attach-label="true">
++        <default-constraints vsize-policy="0" hsize-policy="2" anchor="8" fill="1" />
++      </item>
++      <item class="javax.swing.JTable" icon="/com/intellij/uiDesigner/icons/table.svg" removable="false" auto-create-binding="true" can-attach-label="false">
++        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
++          <preferred-size width="150" height="50" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JList" icon="/com/intellij/uiDesigner/icons/list.svg" removable="false" auto-create-binding="true" can-attach-label="false">
++        <default-constraints vsize-policy="6" hsize-policy="2" anchor="0" fill="3">
++          <preferred-size width="150" height="50" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JTree" icon="/com/intellij/uiDesigner/icons/tree.svg" removable="false" auto-create-binding="true" can-attach-label="false">
++        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
++          <preferred-size width="150" height="50" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JTabbedPane" icon="/com/intellij/uiDesigner/icons/tabbedPane.svg" removable="false" auto-create-binding="true" can-attach-label="false">
++        <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="3">
++          <preferred-size width="200" height="200" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JSplitPane" icon="/com/intellij/uiDesigner/icons/splitPane.svg" removable="false" auto-create-binding="false" can-attach-label="false">
++        <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="3">
++          <preferred-size width="200" height="200" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JSpinner" icon="/com/intellij/uiDesigner/icons/spinner.svg" removable="false" auto-create-binding="true" can-attach-label="true">
++        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1" />
++      </item>
++      <item class="javax.swing.JSlider" icon="/com/intellij/uiDesigner/icons/slider.svg" removable="false" auto-create-binding="true" can-attach-label="false">
++        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1" />
++      </item>
++      <item class="javax.swing.JSeparator" icon="/com/intellij/uiDesigner/icons/separator.svg" removable="false" auto-create-binding="false" can-attach-label="false">
++        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3" />
++      </item>
++      <item class="javax.swing.JProgressBar" icon="/com/intellij/uiDesigner/icons/progressbar.svg" removable="false" auto-create-binding="true" can-attach-label="false">
++        <default-constraints vsize-policy="0" hsize-policy="6" anchor="0" fill="1" />
++      </item>
++      <item class="javax.swing.JToolBar" icon="/com/intellij/uiDesigner/icons/toolbar.svg" removable="false" auto-create-binding="false" can-attach-label="false">
++        <default-constraints vsize-policy="0" hsize-policy="6" anchor="0" fill="1">
++          <preferred-size width="-1" height="20" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JToolBar$Separator" icon="/com/intellij/uiDesigner/icons/toolbarSeparator.svg" removable="false" auto-create-binding="false" can-attach-label="false">
++        <default-constraints vsize-policy="0" hsize-policy="0" anchor="0" fill="1" />
++      </item>
++      <item class="javax.swing.JScrollBar" icon="/com/intellij/uiDesigner/icons/scrollbar.svg" removable="false" auto-create-binding="true" can-attach-label="false">
++        <default-constraints vsize-policy="6" hsize-policy="0" anchor="0" fill="2" />
++      </item>
++    </group>
++  </component>
++</project>
+\ No newline at end of file
+Index: .idea/encodings.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/encodings.xml b/.idea/encodings.xml
+new file mode 100644
+--- /dev/null	
++++ b/.idea/encodings.xml	
+@@ -0,0 +1,10 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="Encoding">
++    <file url="file://$PROJECT_DIR$/core-service/src/main/java" charset="UTF-8" />
++    <file url="file://$PROJECT_DIR$/kafka-processor/src/main/java" charset="UTF-8" />
++    <file url="file://$PROJECT_DIR$/soap-adapter/src/main/java" charset="UTF-8" />
++    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
++    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
++  </component>
++</project>
+\ No newline at end of file
+Index: core-service/src/main/resources/db/migration/V1__create_users_table.sql
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>CREATE TABLE users (\n    id NUMBER(19,0) GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,\n    email VARCHAR(255) NOT NULL UNIQUE,\n    full_name VARCHAR(255) NOT NULL,\n    active BOOLEAN NULL\n);
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/core-service/src/main/resources/db/migration/V1__create_users_table.sql b/core-service/src/main/resources/db/migration/V1__create_users_table.sql
+--- a/core-service/src/main/resources/db/migration/V1__create_users_table.sql	
++++ b/core-service/src/main/resources/db/migration/V1__create_users_table.sql	
+@@ -1,6 +1,6 @@
+ CREATE TABLE users (
+-    id NUMBER(19,0) GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
++    id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+     email VARCHAR(255) NOT NULL UNIQUE,
+     full_name VARCHAR(255) NOT NULL,
+-    active BOOLEAN NULL
++    active BOOLEAN DEFAULT TRUE
+ );
+\ No newline at end of file
+Index: .idea/modules.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/modules.xml b/.idea/modules.xml
+new file mode 100644
+--- /dev/null	
++++ b/.idea/modules.xml	
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="ProjectModuleManager">
++    <modules>
++      <module fileurl="file://$PROJECT_DIR$/soap-adapter/soap-adapter.iml" filepath="$PROJECT_DIR$/soap-adapter/soap-adapter.iml" />
++    </modules>
++  </component>
++</project>
+\ No newline at end of file
+Index: soap-adapter/soap-adapter.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/soap-adapter/soap-adapter.iml b/soap-adapter/soap-adapter.iml
+new file mode 100644
+--- /dev/null	
++++ b/soap-adapter/soap-adapter.iml	
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module version="4">
++  <component name="AdditionalModuleElements">
++    <content url="file://$MODULE_DIR$" dumb="true">
++      <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/jaxb" isTestSource="false" generated="true" />
++    </content>
++  </component>
++</module>
+\ No newline at end of file
+Index: .idea/compiler.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"CompilerConfiguration\">\n    <annotationProcessing>\n      <profile name=\"Annotation profile for enterprise-identity-platform\" enabled=\"true\">\n        <sourceOutputDir name=\"target/generated-sources/annotations\" />\n        <sourceTestOutputDir name=\"target/generated-test-sources/test-annotations\" />\n        <outputRelativeToContentRoot value=\"true\" />\n        <processorPath useClasspath=\"false\">\n          <entry name=\"$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar\" />\n          <entry name=\"$MAVEN_REPOSITORY$/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar\" />\n          <entry name=\"$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar\" />\n          <entry name=\"$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.5.5.Final/mapstruct-1.5.5.Final.jar\" />\n        </processorPath>\n        <module name=\"core-service\" />\n      </profile>\n      <profile name=\"Maven default annotation processors profile\" enabled=\"true\">\n        <sourceOutputDir name=\"target/generated-sources/annotations\" />\n        <sourceTestOutputDir name=\"target/generated-test-sources/test-annotations\" />\n        <outputRelativeToContentRoot value=\"true\" />\n        <module name=\"kafka-processor\" />\n        <module name=\"soap-adapter\" />\n      </profile>\n    </annotationProcessing>\n  </component>\n  <component name=\"JavacSettings\">\n    <option name=\"ADDITIONAL_OPTIONS_OVERRIDE\">\n      <module name=\"core-service\" options=\"-parameters\" />\n    </option>\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/compiler.xml b/.idea/compiler.xml
+--- a/.idea/compiler.xml	
++++ b/.idea/compiler.xml	
+@@ -2,30 +2,46 @@
+ <project version="4">
+   <component name="CompilerConfiguration">
+     <annotationProcessing>
+-      <profile name="Annotation profile for enterprise-identity-platform" enabled="true">
++      <profile default="true" name="Default" enabled="true" />
++      <profile name="Maven default annotation processors profile" enabled="true">
++        <sourceOutputDir name="target/generated-sources/annotations" />
++        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
++        <outputRelativeToContentRoot value="true" />
++        <module name="kafka-processor" />
++      </profile>
++      <profile name="Annotation profile for soap-adapter" enabled="true">
+         <sourceOutputDir name="target/generated-sources/annotations" />
+         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+         <outputRelativeToContentRoot value="true" />
+         <processorPath useClasspath="false">
+-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
+-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
+           <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar" />
+           <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.5.5.Final/mapstruct-1.5.5.Final.jar" />
++          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
++          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
+         </processorPath>
+-        <module name="core-service" />
++        <module name="soap-adapter" />
+       </profile>
+-      <profile name="Maven default annotation processors profile" enabled="true">
++      <profile name="Annotation profile for enterprise-identity-platform" enabled="true">
+         <sourceOutputDir name="target/generated-sources/annotations" />
+         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+         <outputRelativeToContentRoot value="true" />
+-        <module name="kafka-processor" />
+-        <module name="soap-adapter" />
++        <processorPath useClasspath="false">
++          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
++          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
++          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar" />
++          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.5.5.Final/mapstruct-1.5.5.Final.jar" />
++        </processorPath>
++        <module name="core-service" />
+       </profile>
+     </annotationProcessing>
+   </component>
+   <component name="JavacSettings">
++    <option name="DEPRECATION" value="false" />
+     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+       <module name="core-service" options="-parameters" />
++      <module name="enterprise-identity-platform" options="-parameters" />
++      <module name="kafka-processor" options="-parameters" />
++      <module name="soap-adapter" options="-parameters" />
+     </option>
+   </component>
+ </project>
+\ No newline at end of file
+Index: kafka-processor/pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n    <modelVersion>4.0.0</modelVersion>\n\n    <parent>\n        <groupId>com.bourasenterprises.identity</groupId>\n        <artifactId>enterprise-identity-platform</artifactId>\n        <version>1.0.0-SNAPSHOT</version>\n    </parent>\n\n    <artifactId>kafka-processor</artifactId>\n\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/kafka-processor/pom.xml b/kafka-processor/pom.xml
+--- a/kafka-processor/pom.xml	
++++ b/kafka-processor/pom.xml	
+@@ -9,4 +9,36 @@
+ 
+     <artifactId>kafka-processor</artifactId>
+ 
++    <dependencies>
++        <dependency>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter</artifactId>
++        </dependency>
++
++        <dependency>
++            <groupId>org.springframework.kafka</groupId>
++            <artifactId>spring-kafka</artifactId>
++        </dependency>
++
++        <dependency>
++            <groupId>com.fasterxml.jackson.core</groupId>
++            <artifactId>jackson-databind</artifactId>
++        </dependency>
++
++        <dependency>
++            <groupId>org.projectlombok</groupId>
++            <artifactId>lombok</artifactId>
++            <version>1.18.30</version>
++            <scope>provided</scope>
++        </dependency>
++    </dependencies>
++
++    <build>
++        <plugins>
++            <plugin>
++                <groupId>org.springframework.boot</groupId>
++                <artifactId>spring-boot-maven-plugin</artifactId>
++            </plugin>
++        </plugins>
++    </build>
+ </project>
+\ No newline at end of file
+Index: soap-adapter/pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n    <modelVersion>4.0.0</modelVersion>\n\n    <parent>\n        <groupId>com.bourasenterprises.identity</groupId>\n        <artifactId>enterprise-identity-platform</artifactId>\n        <version>1.0.0-SNAPSHOT</version>\n    </parent>\n\n    <artifactId>soap-adapter</artifactId>\n\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/soap-adapter/pom.xml b/soap-adapter/pom.xml
+--- a/soap-adapter/pom.xml	
++++ b/soap-adapter/pom.xml	
+@@ -9,4 +9,102 @@
+ 
+     <artifactId>soap-adapter</artifactId>
+ 
++    <dependencies>
++        <dependency>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter-web-services</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter-security</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
++        </dependency>
++
++        <dependency>
++            <groupId>wsdl4j</groupId>
++            <artifactId>wsdl4j</artifactId>
++        </dependency>
++
++        <dependency>
++            <groupId>jakarta.xml.bind</groupId>
++            <artifactId>jakarta.xml.bind-api</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>org.glassfish.jaxb</groupId>
++            <artifactId>jaxb-runtime</artifactId>
++        </dependency>
++
++        <dependency>
++            <groupId>org.mapstruct</groupId>
++            <artifactId>mapstruct</artifactId>
++            <version>1.5.5.Final</version>
++        </dependency>
++        <dependency>
++            <groupId>org.projectlombok</groupId>
++            <artifactId>lombok</artifactId>
++            <version>1.18.30</version>
++            <scope>provided</scope>
++        </dependency>
++    </dependencies>
++
++    <build>
++        <plugins>
++            <plugin>
++                <groupId>org.codehaus.mojo</groupId>
++                <artifactId>jaxb2-maven-plugin</artifactId>
++                <version>3.1.0</version>
++                <executions>
++                    <execution>
++                        <id>xjc</id>
++                        <goals>
++                            <goal>xjc</goal>
++                        </goals>
++                    </execution>
++                </executions>
++                <configuration>
++                    <sources>
++                        <source>${project.basedir}/src/main/resources/wsdl</source>
++                    </sources>
++                    <outputDirectory>${project.build.directory}/generated-sources/jaxb</outputDirectory>
++                    <packageName>com.bourasenterprises.identity.soap.gen</packageName>
++                    <clearOutputDir>false</clearOutputDir>
++                </configuration>
++            </plugin>
++
++            <plugin>
++                <groupId>org.apache.maven.plugins</groupId>
++                <artifactId>maven-compiler-plugin</artifactId>
++                <version>3.11.0</version>
++                <configuration>
++                    <source>17</source>
++                    <target>17</target>
++                    <annotationProcessorPaths>
++                        <path>
++                            <groupId>org.mapstruct</groupId>
++                            <artifactId>mapstruct-processor</artifactId>
++                            <version>1.5.5.Final</version>
++                        </path>
++                        <path>
++                            <groupId>org.projectlombok</groupId>
++                            <artifactId>lombok</artifactId>
++                            <version>1.18.30</version>
++                        </path>
++                        <path>
++                            <groupId>org.projectlombok</groupId>
++                            <artifactId>lombok-mapstruct-binding</artifactId>
++                            <version>0.2.0</version>
++                        </path>
++                    </annotationProcessorPaths>
++                </configuration>
++            </plugin>
++
++            <plugin>
++                <groupId>org.springframework.boot</groupId>
++                <artifactId>spring-boot-maven-plugin</artifactId>
++            </plugin>
++        </plugins>
++    </build>
+ </project>
+\ No newline at end of file
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\n  <component name=\"MavenProjectsManager\">\n    <option name=\"originalFiles\">\n      <list>\n        <option value=\"$PROJECT_DIR$/pom.xml\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_20\" default=\"true\" project-jdk-name=\"20\" project-jdk-type=\"JavaSDK\" />\n  <component name=\"ProjectType\">\n    <option name=\"id\" value=\"jpab\" />\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	
++++ b/.idea/misc.xml	
+@@ -8,7 +8,7 @@
+       </list>
+     </option>
+   </component>
+-  <component name="ProjectRootManager" version="2" languageLevel="JDK_20" default="true" project-jdk-name="20" project-jdk-type="JavaSDK" />
++  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" project-jdk-name="17" project-jdk-type="JavaSDK" />
+   <component name="ProjectType">
+     <option name="id" value="jpab" />
+   </component>
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><project xmlns=\"http://maven.apache.org/POM/4.0.0\"\n         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0\n                             http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n\n    <modelVersion>4.0.0</modelVersion>\n\n    <groupId>com.bourasenterprises.identity</groupId>\n    <artifactId>enterprise-identity-platform</artifactId>\n    <version>1.0.0-SNAPSHOT</version>\n    <packaging>pom</packaging>\n\n    <modules>\n        <module>core-service</module>\n        <module>kafka-processor</module>\n        <module>soap-adapter</module>\n    </modules>\n\n    <properties>\n        <java.version>17</java.version>\n        <spring.boot.version>3.2.0</spring.boot.version>\n    </properties>\n\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pom.xml b/pom.xml
+--- a/pom.xml	
++++ b/pom.xml	
+@@ -10,6 +10,13 @@
+     <version>1.0.0-SNAPSHOT</version>
+     <packaging>pom</packaging>
+ 
++    <parent>
++        <groupId>org.springframework.boot</groupId>
++        <artifactId>spring-boot-starter-parent</artifactId>
++        <version>3.2.0</version>
++        <relativePath/>
++    </parent>
++
+     <modules>
+         <module>core-service</module>
+         <module>kafka-processor</module>
+@@ -18,7 +25,35 @@
+ 
+     <properties>
+         <java.version>17</java.version>
+-        <spring.boot.version>3.2.0</spring.boot.version>
++        <maven.compiler.source>17</maven.compiler.source>
++        <maven.compiler.target>17</maven.compiler.target>
++        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+     </properties>
+ 
++    <dependencyManagement>
++        <dependencies>
++            <dependency>
++                <groupId>org.springframework.boot</groupId>
++                <artifactId>spring-boot-dependencies</artifactId>
++                <version>3.2.0</version>
++                <type>pom</type>
++                <scope>import</scope>
++            </dependency>
++        </dependencies>
++    </dependencyManagement>
++
++    <build>
++        <plugins>
++            <plugin>
++                <groupId>org.apache.maven.plugins</groupId>
++                <artifactId>maven-compiler-plugin</artifactId>
++                <version>3.11.0</version>
++                <configuration>
++                    <source>${java.version}</source>
++                    <target>${java.version}</target>
++                </configuration>
++            </plugin>
++        </plugins>
++    </build>
++
+ </project>
+\ No newline at end of file
+Index: .idea/git_toolbox_blame.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/git_toolbox_blame.xml b/.idea/git_toolbox_blame.xml
+new file mode 100644
+--- /dev/null	
++++ b/.idea/git_toolbox_blame.xml	
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="GitToolBoxBlameSettings">
++    <option name="version" value="2" />
++  </component>
++</project>
+\ No newline at end of file
+Index: core-service/src/main/java/com/bourasenterprises/identity/core/adapter/error/GlobalExceptionHandler.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.bourasenterprises.identity.core.adapter.error;\n\nimport java.time.Instant;\nimport java.util.List;\n\nimport com.bourasenterprises.identity.core.domain.exception.BusinessException;\nimport com.bourasenterprises.identity.core.domain.exception.ErrorCode;\nimport org.slf4j.MDC;\nimport org.springframework.http.HttpStatus;\nimport org.springframework.http.ResponseEntity;\nimport org.springframework.web.bind.MethodArgumentNotValidException;\nimport org.springframework.web.bind.annotation.ExceptionHandler;\nimport org.springframework.web.bind.annotation.RestControllerAdvice;\n\n@RestControllerAdvice\npublic class GlobalExceptionHandler {\n\n    @ExceptionHandler(BusinessException.class)\n    public ResponseEntity<ApiErrorResponse> handleBusiness(BusinessException ex){\n        ErrorCode ec = ex.getErrorCode();\n\n        ApiErrorResponse errorResponse = baseError(\n                ec.getStatus(),\n                ec.getCode(),\n                ex.getCustomMessage());\n\n        return ResponseEntity.status(ex.getErrorCode().getStatus()).body(errorResponse);\n    }\n\n    @ExceptionHandler(MethodArgumentNotValidException.class)\n    public ResponseEntity<ApiErrorResponse> handleValidation(MethodArgumentNotValidException ex){\n\n        List<ApiErrorDetail> details = ex.getBindingResult()\n            .getFieldErrors()\n            .stream()\n            .map(err -> new ApiErrorDetail(\n                err.getField(),\n                err.getDefaultMessage()\n            ))\n            .toList();\n        \n        ApiErrorResponse error = baseError(HttpStatus.BAD_REQUEST, \"VALIDATION_ERROR\", \"Invalid Request\");\n        error.setDetails(details);\n\n        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);\n            \n    }\n\n    @ExceptionHandler(Exception.class)\n    public ResponseEntity<ApiErrorResponse> handleGeneric(Exception ex){\n        ApiErrorResponse error = baseError(\n            HttpStatus.INTERNAL_SERVER_ERROR,\n            \"INTERNAL_ERROR\", \n            \"Unexpected Error\"\n        );\n\n        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);    \n\n    }\n\n\n    \n    private ApiErrorResponse baseError(HttpStatus status, String code, String message){\n        ApiErrorResponse error = new ApiErrorResponse();\n        error.setTimestamp(Instant.now());\n        error.setStatus(status.value());\n        error.setError(code);\n        error.setErrorMessage(message);\n        error.setCorrelationId(MDC.get(\"correlationId\"));\n        return error;\n    }\n    \n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/core-service/src/main/java/com/bourasenterprises/identity/core/adapter/error/GlobalExceptionHandler.java b/core-service/src/main/java/com/bourasenterprises/identity/core/adapter/error/GlobalExceptionHandler.java
+--- a/core-service/src/main/java/com/bourasenterprises/identity/core/adapter/error/GlobalExceptionHandler.java	
++++ b/core-service/src/main/java/com/bourasenterprises/identity/core/adapter/error/GlobalExceptionHandler.java	
+@@ -8,6 +8,8 @@
+ import org.slf4j.MDC;
+ import org.springframework.http.HttpStatus;
+ import org.springframework.http.ResponseEntity;
++import org.springframework.security.access.AccessDeniedException;
++import org.springframework.security.core.AuthenticationException;
+ import org.springframework.web.bind.MethodArgumentNotValidException;
+ import org.springframework.web.bind.annotation.ExceptionHandler;
+ import org.springframework.web.bind.annotation.RestControllerAdvice;
+@@ -46,6 +48,26 @@
+             
+     }
+ 
++    @ExceptionHandler(AccessDeniedException.class)
++    public ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex) {
++        ApiErrorResponse error = baseError(
++                HttpStatus.FORBIDDEN,
++                "ACCESS_DENIED",
++                "You do not have the required roles to access this resource. Please contact your administrator."
++        );
++        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
++    }
++
++    @ExceptionHandler(AuthenticationException.class)
++    public ResponseEntity<Object> handleAuthenticationException(AuthenticationException ex) {
++        ApiErrorResponse error = baseError(
++                HttpStatus.UNAUTHORIZED,
++                "UNAUTHENTICATED",
++                "Full authentication is required to access this resource. Check if your token is missing, invalid or expired."
++        );
++        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
++    }
++
+     @ExceptionHandler(Exception.class)
+     public ResponseEntity<ApiErrorResponse> handleGeneric(Exception ex){
+         ApiErrorResponse error = baseError(
+@@ -53,7 +75,7 @@
+             "INTERNAL_ERROR", 
+             "Unexpected Error"
+         );
+-
++        ex.printStackTrace();
+         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);    
+ 
+     }
+Index: core-service/src/main/resources/application.yml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>server:\n  port: 8080\n\nspring:\n  datasource:\n    url: jdbc:h2:mem:coredb;MODE=Oracle\n    driver-class-name: org.h2.Driver\n    user: sa\n    password:\n  \n  jpa:\n    hibernate:\n      ddl-auto: update\n    show-sql: true\n    properties:\n      hibernate:\n        format_sql: true\n\n  h2:\n    console:\n      enabled: true\n  \n  flyway:\n    enabled: true\n        
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/core-service/src/main/resources/application.yml b/core-service/src/main/resources/application.yml
+--- a/core-service/src/main/resources/application.yml	
++++ b/core-service/src/main/resources/application.yml	
+@@ -3,23 +3,29 @@
+ 
+ spring:
+   datasource:
+-    url: jdbc:h2:mem:coredb;MODE=Oracle
+-    driver-class-name: org.h2.Driver
+-    user: sa
+-    password:
+-  
++    url: jdbc:postgresql://localhost:5433/identity_db
++    username: user
++    password: password
++    driver-class-name: org.postgresql.Driver
++
+   jpa:
+     hibernate:
+-      ddl-auto: update
++      ddl-auto: validate
+     show-sql: true
+     properties:
+       hibernate:
+-        format_sql: true
+-
+-  h2:
+-    console:
+-      enabled: true
++        dialect: org.hibernate.dialect.PostgreSQLDialect
+   
+   flyway:
+     enabled: true
+-        
+\ No newline at end of file
++
++  security:
++    oauth2:
++      resourceserver:
++        jwt:
++          issuer-uri: http://localhost:8081/realms/enterprise-platform
++
++app:
++  security:
++    cors:
++      allowed-origins: "*"
+\ No newline at end of file

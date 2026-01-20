@@ -3,23 +3,29 @@ server:
 
 spring:
   datasource:
-    url: jdbc:h2:mem:coredb;MODE=Oracle
-    driver-class-name: org.h2.Driver
-    user: sa
-    password:
-  
+    url: jdbc:postgresql://localhost:5433/identity_db
+    username: user
+    password: password
+    driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
-        format_sql: true
-
-  h2:
-    console:
-      enabled: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   
   flyway:
     enabled: true
-        
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081/realms/enterprise-platform
+
+app:
+  security:
+    cors:
+      allowed-origins: "*"

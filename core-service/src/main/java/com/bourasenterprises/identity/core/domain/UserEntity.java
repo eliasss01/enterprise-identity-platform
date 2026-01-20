@@ -11,6 +11,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "users")
 @Data
@@ -18,19 +20,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class UserEntity {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", columnDefinition = "NUMBER(19,0)")
     private Long id;
 
-    @Column(nullable = false, unique = true, name = "email")
+    @Column(name = "keycloak_id", nullable = false, unique = true)
+    private UUID keycloakId;
+
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false, name = "full_name")
     private String fullName;
 
-    @Column(name = "ACTIVE", nullable = true)
-    private Boolean active;
+    private String role = "OPERATOR"; // Default per il funnel
+
+    private boolean active = true;
 
 }

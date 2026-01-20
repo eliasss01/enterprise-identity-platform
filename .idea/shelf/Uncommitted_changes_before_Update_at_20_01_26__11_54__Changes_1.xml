@@ -1,0 +1,24 @@
+<changelist name="Uncommitted_changes_before_Update_at_20_01_26,_11_54_[Changes]1" date="1768906450027" recycled="true" deleted="true">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_01_26,_11_54_[Changes]1/shelved.patch" />
+  <option name="DESCRIPTION" value="Uncommitted changes before Update at 20/01/26, 11:54 [Changes]" />
+  <binary>
+    <option name="BEFORE_PATH" value="core-service/target/classes/com/bourasenterprises/identity/core/adapter/error/GlobalExceptionHandler.class" />
+    <option name="AFTER_PATH" value="core-service/target/classes/com/bourasenterprises/identity/core/adapter/error/GlobalExceptionHandler.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_01_26,_11_54_[Changes]1/GlobalExceptionHandler.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="core-service/target/classes/com/bourasenterprises/identity/core/application/UserApplicationService.class" />
+    <option name="AFTER_PATH" value="core-service/target/classes/com/bourasenterprises/identity/core/application/UserApplicationService.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_01_26,_11_54_[Changes]1/UserApplicationService.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="core-service/target/classes/com/bourasenterprises/identity/core/domain/exception/BusinessException.class" />
+    <option name="AFTER_PATH" value="core-service/target/classes/com/bourasenterprises/identity/core/domain/exception/BusinessException.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_01_26,_11_54_[Changes]1/BusinessException.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="core-service/target/classes/com/bourasenterprises/identity/core/adapter/error/ApiErrorResponse.class" />
+    <option name="AFTER_PATH" value="core-service/target/classes/com/bourasenterprises/identity/core/adapter/error/ApiErrorResponse.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_01_26,_11_54_[Changes]1/ApiErrorResponse.class" />
+  </binary>
+</changelist>
