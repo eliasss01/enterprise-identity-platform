@@ -46,7 +46,7 @@ services:
   # --- MICROSERVIZI ---
 
   core-service:
-    build: ../../core-service
+    build: core-service
     container_name: core-service
     ports:
       - "8080:8080"
@@ -63,7 +63,7 @@ services:
       - keycloak
 
   kafka-processor:
-    build: ../../kafka-processor
+    build: kafka-processor
     container_name: kafka-processor
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
