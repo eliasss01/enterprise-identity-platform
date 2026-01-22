@@ -35,6 +35,6 @@ public class UserEntity {
 
     private String role = "OPERATOR"; // Default per il funnel
 
-    private boolean active = true;
+    private Boolean active = true;
 
 }
