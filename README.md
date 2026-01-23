@@ -17,7 +17,6 @@ enterprise-identity-platform/
 ├── .env.example # Environment template
 
 yaml
-Copia codice
 
 Infrastructure:
 - PostgreSQL
@@ -87,12 +86,10 @@ Infrastructure:
 
 Copy the environment template:
 
-```bash
+```
 cp .env.example .env
 Edit .env with your values:
 
-env
-Copia codice
 POSTGRES_DB=enterprise
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
@@ -107,16 +104,12 @@ CORE_SERVICE_PASS=soappass
 Build (optional)
 If you want to build jars manually:
 
-bash
-Copia codice
 mvn clean package -DskipTests
 Otherwise Docker Compose will build everything automatically.
 
 Run the entire system
 From project root:
 
-bash
-Copia codice
 docker compose up --build
 After startup:
 
@@ -132,8 +125,6 @@ Kafka (external): localhost:9094
 
 Healthcheck:
 
-bash
-Copia codice
 http://localhost:8080/actuator/health
 Keycloak Setup
 Open http://localhost:8081
@@ -156,8 +147,6 @@ Access Type: confidential
 
 Generate client secret and put it into .env:
 
-env
-Copia codice
 KEYCLOAK_CLIENT_SECRET=...
 Core-service is configured as OAuth2 Resource Server.
 
