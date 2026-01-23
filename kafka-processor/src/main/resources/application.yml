@@ -1,13 +1,15 @@
 spring:
+  application:
+    name: kafka-processor
+
   kafka:
     consumer:
       group-id: provisioning-group
       auto-offset-reset: earliest
-      # Usa l'ErrorHandlingDeserializer per evitare il blocco del loop
+      # Configurazione robusta per la deserializzazione
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
         spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
-        # QUESTI DUE SONO FONDAMENTALI:
         spring.json.use.type.headers: false
         spring.json.value.default.type: com.bourasenterprises.kafka.domain.events.SubscriptionActivatedEvent
         spring.json.trusted.packages: "*"

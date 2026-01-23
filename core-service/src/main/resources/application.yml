@@ -1,33 +1,18 @@
 server:
   port: 8080
 
-
 spring:
-  datasource:
-    # IMPORTANTE: Dentro Docker usa il nome del servizio 'postgres' e porta '5432'
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/identity_db}
-    username: user
-    password: password
-    driver-class-name: org.postgresql.Driver
-
+  application:
+    name: core-service
   jpa:
     hibernate:
       ddl-auto: validate
     show-sql: true
-
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          # IMPORTANTE: Deve puntare a 'keycloak:8080' per la verifica del token interna
-          issuer-uri: ${JWT_ISSUER_URI:http://keycloak:8080/realms/enterprise-platform}
-
   kafka:
-    # Usa 'kafka' se nel compose il servizio si chiama così
-    bootstrap-servers: ${KAFKA_URL:kafka:9092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
 app:
   security:
     cors:

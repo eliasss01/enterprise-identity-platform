@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/identity_db
+    username: user
+    password: password
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8080/realms/enterprise-platform
+
+  kafka:
+    bootstrap-servers: kafka:9092

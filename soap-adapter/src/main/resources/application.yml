@@ -2,11 +2,5 @@ server:
   port: 8082
 
 spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          # Deve corrispondere esattamente al campo "iss" del tuo token
-          issuer-uri: http://localhost:8081/realms/enterprise-platform
-          # Questo serve per scaricare le chiavi pubbliche per verificare la firma
-          jwk-set-uri: http://localhost:8081/realms/enterprise-platform/protocol/openid-connect/certs
+  application:
+    name: soap-adapter

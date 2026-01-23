@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/identity_db
+    username: user
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081/realms/enterprise-platform
+
+  kafka:
+    bootstrap-servers: localhost:9094

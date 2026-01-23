@@ -5,20 +5,19 @@ services:
     image: postgres:15
     container_name: postgres-db
     environment:
-      POSTGRES_DB: identity_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5433:5432"
 
   kafka:
     image: apache/kafka:latest
-    container_name: kafka-broker
+    container_name: kafka
     ports:
       - "9092:9092"
       - "9094:9094"
     environment:
-      # Rimuovi CFG dove vedi che dà errore
       - KAFKA_NODE_ID=1
       - KAFKA_PROCESS_ROLES=broker,controller
       - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
@@ -40,8 +39,8 @@ services:
     ports:
       - "8081:8080"
     environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
 
   # --- MICROSERVIZI ---
 
@@ -51,12 +50,15 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/identity_db
-      - SPRING_DATASOURCE_USERNAME=user
-      - SPRING_DATASOURCE_PASSWORD=password
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - KEYCLOAK_SERVER_URL=http://keycloak:8080
-      - KEYCLOAK_CLIENT_SECRET=1L7KmsXHHs38QtbTh7K0m8gOr8p004zN
+      - SPRING_PROFILES_ACTIVE=docker
+      - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
+    healthcheck:
+      # Nota: Assicurati che 'curl' sia installato nell'immagine Docker del microservizio
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 25s
     depends_on:
       - postgres
       - kafka
@@ -66,6 +68,23 @@ services:
     build: kafka-processor
     container_name: kafka-processor
     environment:
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_PROFILES_ACTIVE=docker
     depends_on:
       - kafka
+    healthcheck:
+      test: [ "CMD-SHELL", "ps aux | grep java | grep -v grep" ]
+      interval: 30s
+      start_period: 20s
+
+  soap-adapter:
+    build: soap-adapter
+    container_name: soap-adapter
+    ports:
+      - "8082:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - CORE_SERVICE_USER=${CORE_SERVICE_USER}
+      - CORE_SERVICE_PASS=${CORE_SERVICE_PASS}
+    depends_on:
+      core-service:
+        condition: service_healthy

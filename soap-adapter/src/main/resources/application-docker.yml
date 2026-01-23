@@ -1,0 +1,10 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8080/realms/enterprise-platform
+
+# URL per chiamare il core-service dentro la rete Docker
+app:
+  core-service-url: http://core-service:8080

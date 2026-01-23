@@ -2,6 +2,7 @@ package com.bourasenterprises.soapadapter.client;
 
 import com.bourasenterprises.soapadapter.client.dto.UserResponse;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.http.HttpEntity;
@@ -15,9 +16,12 @@ import org.springframework.web.client.RestTemplate;
 public class CoreServiceClient {
 
     private final RestTemplate restTemplate;
+    private final String coreServiceUrl;
 
-    public CoreServiceClient(RestTemplateBuilder builder) {
+    public CoreServiceClient(RestTemplateBuilder builder,
+                             @Value("${app.core-service-url}") String coreServiceUrl) {
         this.restTemplate = builder.build();
+        this.coreServiceUrl = coreServiceUrl;
     }
 
 
@@ -36,7 +40,7 @@ public class CoreServiceClient {
         HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
 
         return restTemplate.exchange(
-                "http://localhost:8080/api/v1/users/" + id,
+                coreServiceUrl + "/api/v1/users/" + id,
                 HttpMethod.GET,
                 requestEntity,
                 UserResponse.class

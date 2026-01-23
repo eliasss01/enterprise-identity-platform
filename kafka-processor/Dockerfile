@@ -1,6 +1,13 @@
-# Fase 1: Build (opzionale se buildi prima con Maven sul tuo PC)
+# BUILD STAGE
+FROM maven:3.9-eclipse-temurin-17 AS build
+WORKDIR /app
+COPY pom.xml .
+RUN mvn dependency:go-offline
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# RUNTIME STAGE
 FROM eclipse-temurin:17-jre
-# Copia il JAR generato da Maven nella cartella target
-COPY target/*.jar app.jar
-# Comando per avviare l'app
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
