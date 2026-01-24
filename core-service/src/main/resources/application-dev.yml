@@ -5,6 +5,12 @@ spring:
     password: password
     driver-class-name: org.postgresql.Driver
 
+  data:
+    redis:
+      url: redis://localhost:6379
+  cache:
+    type: redis
+
   security:
     oauth2:
       resourceserver:

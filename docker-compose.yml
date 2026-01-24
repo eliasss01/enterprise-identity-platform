@@ -32,6 +32,12 @@ services:
       - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
       - KAFKA_LOG_DIRS=/tmp/kraft-combined-logs
 
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+
   keycloak:
     image: quay.io/keycloak/keycloak:24.0
     container_name: keycloak
@@ -45,7 +51,9 @@ services:
   # --- MICROSERVIZI ---
 
   core-service:
-    build: core-service
+    build:
+      context: ./core-service
+      dockerfile: Dockerfile
     container_name: core-service
     ports:
       - "8080:8080"
@@ -53,8 +61,8 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
     healthcheck:
-      # Nota: Assicurati che 'curl' sia installato nell'immagine Docker del microservizio
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      # Sostituito curl con wget che è più comune nelle immagini slim
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -65,19 +73,19 @@ services:
       - keycloak
 
   kafka-processor:
-    build: kafka-processor
+    build:
+      context: ./kafka-processor
+      dockerfile: Dockerfile
     container_name: kafka-processor
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
       - kafka
-    healthcheck:
-      test: [ "CMD-SHELL", "ps aux | grep java | grep -v grep" ]
-      interval: 30s
-      start_period: 20s
 
   soap-adapter:
-    build: soap-adapter
+    build:
+      context: ./soap-adapter
+      dockerfile: Dockerfile
     container_name: soap-adapter
     ports:
       - "8082:8080"

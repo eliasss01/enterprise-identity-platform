@@ -4,17 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1321799e-a6e9-467f-9e71-51b12b13c3a1" name="Changes" comment="Fix docker-compose path">
+    <list default="true" id="1321799e-a6e9-467f-9e71-51b12b13c3a1" name="Changes" comment="Added read me and multi profile properties">
+      <change afterPath="$PROJECT_DIR$/core-service/core-service.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core-service/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/src/main/java/com/bourasenterprises/identity/core/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/src/main/java/com/bourasenterprises/identity/core/repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/src/main/java/com/bourasenterprises/identity/core/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/src/main/java/com/bourasenterprises/identity/core/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/src/main/resources/application-dev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/src/main/resources/application-dev.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/src/main/resources/application-docker.yml" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/src/main/resources/application-docker.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/kafka-processor/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/kafka-processor/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kafka-processor/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/kafka-processor/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/soap-adapter/src/main/java/com/bourasenterprises/soapadapter/client/CoreServiceClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/soap-adapter/src/main/java/com/bourasenterprises/soapadapter/client/CoreServiceClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/soap-adapter/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/soap-adapter/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/soap-adapter/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/soap-adapter/Dockerfile" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,6 +70,10 @@
     "Docker.docker.postgres: Compose Deployment.executor": "Run",
     "Docker.docker: Compose Deployment.executor": "Run",
     "Docker.keycloak.keycloak: Compose Deployment.executor": "Run",
+    "JUnit.UserIntegrationTest (1).executor": "Run",
+    "JUnit.UserIntegrationTest.executor": "Run",
+    "JUnit.UserIntegrationTest.fullFlow_shouldCreateUserAndPersist.executor": "Run",
+    "JUnit.UserServiceTest.executor": "Run",
     "RequestMappingsPanelOrder0": "0",
     "RequestMappingsPanelOrder1": "1",
     "RequestMappingsPanelWidth0": "75",
@@ -95,6 +102,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/core-service/src/test/resources" />
       <recent name="$PROJECT_DIR$/kafka-processor/src/main/resources" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/infra" />
@@ -113,7 +121,68 @@
       </set>
     </option>
   </component>
-  <component name="RunManager" selected="Docker.docker-compose.yml.kafka: Compose Deployment">
+  <component name="RunManager" selected="JUnit.UserIntegrationTest">
+    <configuration name="UserIntegrationTest (1)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="core-service" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.bourasenterprises.identity.core.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.bourasenterprises.identity.core" />
+      <option name="MAIN_CLASS_NAME" value="com.bourasenterprises.identity.core.UserIntegrationTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserIntegrationTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="core-service" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="integration.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="integration" />
+      <option name="MAIN_CLASS_NAME" value="integration.UserIntegrationTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserIntegrationTest.fullFlow_shouldCreateUserAndPersist" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="core-service" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="integration.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="integration" />
+      <option name="MAIN_CLASS_NAME" value="integration.UserIntegrationTest" />
+      <option name="METHOD_NAME" value="fullFlow_shouldCreateUserAndPersist" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="core-service" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="service" />
+      <option name="MAIN_CLASS_NAME" value="service.UserServiceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="CoreServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="core-service" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.bourasenterprises.identity.core.CoreServiceApplication" />
@@ -128,19 +197,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="SoapAdapterApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
-      <module name="soap-adapter" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.bourasenterprises.soapadapter.SoapAdapterApplication" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.bourasenterprises.soapadapter.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
       <deployment type="docker-compose.yml">
         <settings />
@@ -149,22 +205,6 @@
     </configuration>
     <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
       <deployment type="dockerfile" />
-      <method v="2" />
-    </configuration>
-    <configuration name="core-service/Dockerfile" type="docker-deploy" factoryName="dockerfile" temporary="true" server-name="Docker">
-      <deployment type="dockerfile">
-        <settings>
-          <option name="sourceFilePath" value="core-service/Dockerfile" />
-        </settings>
-      </deployment>
-      <method v="2" />
-    </configuration>
-    <configuration name="docker-compose.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
-      <deployment type="docker-compose.yml">
-        <settings>
-          <option name="sourceFilePath" value="docker-compose.yml" />
-        </settings>
-      </deployment>
       <method v="2" />
     </configuration>
     <configuration name="docker-compose.yml.kafka: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
@@ -180,26 +220,13 @@
       </deployment>
       <method v="2" />
     </configuration>
-    <configuration name="docker-compose.yml.postgres: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
-      <deployment type="docker-compose.yml">
-        <settings>
-          <option name="services">
-            <list>
-              <option value="postgres" />
-            </list>
-          </option>
-          <option name="sourceFilePath" value="docker-compose.yml" />
-        </settings>
-      </deployment>
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.UserIntegrationTest" />
+        <item itemvalue="JUnit.UserIntegrationTest.fullFlow_shouldCreateUserAndPersist" />
+        <item itemvalue="JUnit.UserIntegrationTest (1)" />
+        <item itemvalue="JUnit.UserServiceTest" />
         <item itemvalue="Docker.docker-compose.yml.kafka: Compose Deployment" />
-        <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
-        <item itemvalue="Docker.core-service/Dockerfile" />
-        <item itemvalue="Docker.docker-compose.yml.postgres: Compose Deployment" />
-        <item itemvalue="Spring Boot.SoapAdapterApplication" />
       </list>
     </recent_temporary>
   </component>
@@ -230,7 +257,7 @@
       <workItem from="1768932888982" duration="706000" />
       <workItem from="1768992134097" duration="2858000" />
       <workItem from="1769030718681" duration="3149000" />
-      <workItem from="1769100303294" duration="17400000" />
+      <workItem from="1769100303294" duration="35231000" />
     </task>
     <task id="LOCAL-00001" summary="Added keycloak, kafka and soap adapter">
       <option name="closed" value="true" />
@@ -256,7 +283,15 @@
       <option name="project" value="LOCAL" />
       <updated>1769121782262</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Added read me and multi profile properties">
+      <option name="closed" value="true" />
+      <created>1769200125400</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1769200125400</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -266,6 +301,7 @@
     <MESSAGE value="Added keycloak, kafka and soap adapter" />
     <MESSAGE value="Added kafka listener, and dockerization" />
     <MESSAGE value="Fix docker-compose path" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix docker-compose path" />
+    <MESSAGE value="Added read me and multi profile properties" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added read me and multi profile properties" />
   </component>
 </project>
